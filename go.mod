@@ -1,4 +1,4 @@
-module serve
+module github.com/go-zoox/serve
 
 go 1.18
 

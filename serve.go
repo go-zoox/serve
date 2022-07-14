@@ -11,12 +11,14 @@ import (
 	zd "github.com/go-zoox/zoox/default"
 )
 
+// Config is the configuration of the server.
 type Config struct {
 	Port   int64  `yaml:"port"`
 	Prefix string `yaml:"prefix"`
 	Dir    string `yaml:"dir"`
 }
 
+// Serve starts the server.
 func Serve(cfg *Config) {
 	j, _ := json.MarshalIndent(cfg, "", "  ")
 	logger.Info(string(j))

@@ -33,7 +33,7 @@ RUN         CGO_ENABLED=0 \
               -v -o serve
 
 # Product
-FROM  golang:1.18-alpine
+FROM alpine:latest
 
 LABEL       MAINTAINER="Zero<tobewhatwewant@gmail.com>"
 

@@ -40,8 +40,12 @@ jobs:
 
   publish:
     runs-on: ubuntu-latest
+    container: whatwewant/zmicro:v1
 
     steps:
+      - name: Update zmicro to latest
+        run: zmicro update
+
       - name: Get Current Date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
@@ -53,27 +57,23 @@ jobs:
       - name: Docker Meta
         id: meta
         run: |
-          VERSION=$(echo ${GITHUB_REF} | sed -e "s%refs/tags/%%g")
-          BUILD_TIME=$(date +%Y-%m-%d)
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          ACTION_IMAGE_NAME=$(echo $ACTION_IMAGE_REPO | awk -F "/" '{print $2}')
+          ACTION_IMAGE_NAME=$(echo $GITHUB_REPOSITORY | awk -F "/" '{print $2}')
+          IMAGE_VERSION=$(echo ${GITHUB_REF} | sed -e "s%refs/tags/%%g")
           IMAGE_NAME=${ACTION_IMAGE_NAMESPACE}/${ACTION_IMAGE_NAME}
-          IMAGE_TAGS=${IMAGE_NAME}:${VERSION}
-          echo "IMAGE_TAGS: ${IMAGE_TAGS}"
-          echo "VERSION: ${VERSION} (${COMMIT_HASH} ${BUILD_TIME})"
-          echo "::set-output name=version::${VERSION}"
-          echo "::set-output name=build_time::${BUILD_TIME}"
-          echo "::set-output name=commit_hash::${COMMIT_HASH}"
+          IMAGE_TAGS=$(zmicro fn tag::docker $IMAGE_NAME $IMAGE_VERSION)
+          echo "::set-output name=version::${IMAGE_VERSION}"
           echo "::set-output name=name::${IMAGE_NAME}"
           echo "::set-output name=tags::${IMAGE_TAGS}"
         shell: bash
         env:
           ACTION_IMAGE_NAMESPACE: ${{ secrets.DOCKERHUB_USERNAME }}
-          ACTION_IMAGE_REPO: ${{ github.repository }}
 
       - name: Show Docker Tags
         run: |
           echo "Docker Tags: ${{ steps.meta.outputs.tags }}"
+
+      - name: Fix QEMU depends on Docker CLI
+        run: zmicro package install docker
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1

@@ -19,7 +19,7 @@ func main() {
 		Name:        "Serve",
 		Usage:       "The Serve",
 		Description: "Server static files",
-		Version:     server.Version,
+		Version:     Version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "port",

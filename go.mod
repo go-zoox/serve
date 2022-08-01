@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-zoox/fs v1.2.5
 	github.com/go-zoox/logger v1.2.0
-	github.com/go-zoox/zoox v1.2.7
+	github.com/go-zoox/zoox v1.2.8
 	github.com/urfave/cli/v2 v2.11.0
 )
 
@@ -47,3 +47,5 @@ require (
 	golang.org/x/sys v0.0.0-20220731174439-a90be440212d // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 )
+
+// replace github.com/go-zoox/zoox => ../zoox

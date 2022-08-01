@@ -4,6 +4,8 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"io"
+	gofs "io/fs"
 	"net/http"
 	"path"
 
@@ -35,13 +37,17 @@ func Serve(cfg *Config) {
 			panic("fs_mode is embed, but EmbedFS is nil")
 		}
 
-		app.StaticFS(cfg.Prefix, http.FS(cfg.EmbedFS))
+		subFS, _ := gofs.Sub(cfg.EmbedFS, "web")
 
-		if bytes, err := cfg.EmbedFS.ReadFile(path.Join(cfg.Dir, "index.html")); err == nil {
-			app.Fallback(func(ctx *zoox.Context) {
-				ctx.Status(200)
-				ctx.Write(bytes)
-			})
+		app.StaticFS(cfg.Prefix, http.FS(subFS))
+
+		if f, err := subFS.Open("index.html"); err == nil {
+			if bytes, err := io.ReadAll(f); err == nil {
+				app.Fallback(func(ctx *zoox.Context) {
+					ctx.Status(200)
+					ctx.Write(bytes)
+				})
+			}
 		}
 	} else {
 		app.Static(cfg.Prefix, cfg.Dir)

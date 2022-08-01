@@ -11,6 +11,9 @@ import (
 	"github.com/go-zoox/serve/server"
 )
 
+// //go:embed static/*
+// var static embed.FS
+
 func main() {
 	app := &cli.App{
 		Name:        "Serve",
@@ -58,6 +61,11 @@ func main() {
 			cfg.Port = int64(px)
 			cfg.Prefix = prefix
 			cfg.Dir = dir
+
+			// // embed fs
+			// cfg.FSMode = "embed"
+			// cfg.Dir = "static/"
+			// cfg.EmbedFS = &static
 
 			server.Serve(&cfg)
 

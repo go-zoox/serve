@@ -34,3 +34,5 @@ serve
 data/
 
 bin/
+
+static/

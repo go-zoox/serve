@@ -7,6 +7,8 @@ import (
 	"github.com/go-zoox/fs"
 	"github.com/go-zoox/logger"
 	"github.com/urfave/cli/v2"
+
+	"github.com/go-zoox/serve/server"
 )
 
 func main() {
@@ -14,7 +16,7 @@ func main() {
 		Name:        "Serve",
 		Usage:       "The Serve",
 		Description: "Server static files",
-		Version:     Version,
+		Version:     server.Version,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:    "port",
@@ -51,13 +53,13 @@ func main() {
 				dir = os.Getenv("DIR")
 			}
 
-			var cfg Config
+			var cfg server.Config
 			px, _ := strconv.Atoi(port)
 			cfg.Port = int64(px)
 			cfg.Prefix = prefix
 			cfg.Dir = dir
 
-			Serve(&cfg)
+			server.Serve(&cfg)
 
 			return nil
 		},

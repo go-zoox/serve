@@ -5,9 +5,10 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    # image: whatwewant/serve:v1
     volumes:
       - .:/var/www/html
     ports:
-      - 0.0.0.0:18080:8080/tcp
+      - 0.0.0.0:9000:8080/tcp
     environment:
       PREFIX: /files

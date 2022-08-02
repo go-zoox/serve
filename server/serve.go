@@ -13,6 +13,7 @@ import (
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/zoox"
 	zd "github.com/go-zoox/zoox/default"
+	"github.com/go-zoox/zoox/middleware"
 )
 
 // Config is the configuration of the server.
@@ -23,6 +24,28 @@ type Config struct {
 	FSMode string `yaml:"fs_mode"` // default: system, optional: system | embed
 	//
 	EmbedFS *embed.FS
+	//
+	Proxy Proxy `yaml:"proxy"`
+}
+
+// Proxy is the proxy configuration.
+type Proxy struct {
+	// Rewrites Example:
+	//	{
+	//		"^/api": {
+	//			target: "http://backend:8080",
+	//			rewrites: {
+	//				"^/api/(.*)$": "/$1",
+	//			},
+	//		},
+	//	}
+	Rewrites map[string]ProxyRewrite `yaml:"rewrites"`
+}
+
+// ProxyRewrite is the proxy rewrite target configuration.
+type ProxyRewrite struct {
+	Target   string            `yaml:"target"`
+	Rewrites map[string]string `yaml:"rewrites"`
 }
 
 // Serve starts the server.
@@ -31,6 +54,20 @@ func Serve(cfg *Config) {
 	logger.Info(string(j))
 
 	app := zd.Default()
+
+	if cfg.Proxy.Rewrites != nil {
+		rewrites := make(map[string]middleware.ProxyRewrite)
+		for k, v := range cfg.Proxy.Rewrites {
+			rewrites[k] = middleware.ProxyRewrite{
+				Target:   v.Target,
+				Rewrites: v.Rewrites,
+			}
+		}
+
+		app.Use(middleware.Proxy(&middleware.ProxyConfig{
+			Rewrites: rewrites,
+		}))
+	}
 
 	if cfg.FSMode == "embed" {
 		if cfg.EmbedFS == nil {

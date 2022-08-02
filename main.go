@@ -67,6 +67,17 @@ func main() {
 			// cfg.Dir = "static/"
 			// cfg.EmbedFS = &static
 
+			// // proxy
+			// cfg.Proxy.Enabled = true
+			// cfg.Proxy.Rewrites = map[string]server.ProxyRewrite{
+			// 	"^/api/": {
+			// 		Target: "https://httpbin.zcorky.com",
+			// 		Rewrites: map[string]string{
+			// 			"^/api/(.*)": "/$1",
+			// 		},
+			// 	},
+			// }
+
 			server.Serve(&cfg)
 
 			return nil

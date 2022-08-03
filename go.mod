@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-zoox/fs v1.2.5
 	github.com/go-zoox/logger v1.2.0
-	github.com/go-zoox/zoox v1.2.13
+	github.com/go-zoox/zoox v1.2.14
 	github.com/urfave/cli/v2 v2.11.0
 )
 

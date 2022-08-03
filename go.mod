@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-zoox/fs v1.2.5
 	github.com/go-zoox/logger v1.2.0
-	github.com/go-zoox/zoox v1.2.12
+	github.com/go-zoox/zoox v1.2.13
 	github.com/urfave/cli/v2 v2.11.0
 )
 
@@ -26,7 +26,7 @@ require (
 	github.com/go-zoox/fetch v1.4.4 // indirect
 	github.com/go-zoox/jwt v1.0.0 // indirect
 	github.com/go-zoox/kv v1.4.3 // indirect
-	github.com/go-zoox/proxy v1.2.2 // indirect
+	github.com/go-zoox/proxy v1.2.3 // indirect
 	github.com/go-zoox/random v1.0.0 // indirect
 	github.com/go-zoox/tag v1.1.0 // indirect
 	github.com/go-zoox/uuid v0.0.1 // indirect
@@ -44,7 +44,7 @@ require (
 	github.com/tidwall/pretty v1.2.0 // indirect
 	github.com/xrash/smetrics v0.0.0-20201216005158-039620a65673 // indirect
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
-	golang.org/x/net v0.0.0-20220728211354-c7608f3a8462 // indirect
+	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b // indirect
 	golang.org/x/sys v0.0.0-20220731174439-a90be440212d // indirect
 	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect

@@ -5,7 +5,7 @@ go 1.18
 require (
 	github.com/go-zoox/fs v1.2.5
 	github.com/go-zoox/logger v1.2.0
-	github.com/go-zoox/zoox v1.2.14
+	github.com/go-zoox/zoox v1.2.15
 	github.com/urfave/cli/v2 v2.11.0
 )
 
@@ -17,7 +17,6 @@ require (
 	github.com/go-redis/redis/v8 v8.11.5 // indirect
 	github.com/go-yaml/yaml v2.1.0+incompatible // indirect
 	github.com/go-zoox/chalk v1.0.1 // indirect
-	github.com/go-zoox/compress v1.0.1 // indirect
 	github.com/go-zoox/core-utils v1.0.13 // indirect
 	github.com/go-zoox/crypto v1.0.3 // indirect
 	github.com/go-zoox/datetime v1.0.4 // indirect
@@ -46,7 +45,6 @@ require (
 	golang.org/x/crypto v0.0.0-20220722155217-630584e8d5aa // indirect
 	golang.org/x/net v0.0.0-20220802222814-0bcc04d9c69b // indirect
 	golang.org/x/sys v0.0.0-20220731174439-a90be440212d // indirect
-	golang.org/x/text v0.3.7 // indirect
 	golang.org/x/xerrors v0.0.0-20220609144429-65e65417b02f // indirect
 )
 

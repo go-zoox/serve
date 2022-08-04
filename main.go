@@ -4,9 +4,8 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/go-zoox/cli"
 	"github.com/go-zoox/fs"
-	"github.com/go-zoox/logger"
-	"github.com/urfave/cli/v2"
 
 	"github.com/go-zoox/serve/server"
 )
@@ -15,7 +14,7 @@ import (
 // var static embed.FS
 
 func main() {
-	app := &cli.App{
+	app := cli.NewSingleProgram(&cli.SingleProgramConfig{
 		Name:        "Serve",
 		Usage:       "The Serve",
 		Description: "Server static files",
@@ -40,53 +39,52 @@ func main() {
 				Aliases: []string{"d"},
 			},
 		},
-		Action: func(c *cli.Context) error {
-			port := c.String("port")
-			if os.Getenv("PORT") != "" {
-				port = os.Getenv("PORT")
-			}
+	})
 
-			prefix := c.String("prefix")
-			if os.Getenv("PREFIX") != "" {
-				prefix = os.Getenv("PREFIX")
-			}
+	app.Command(func(c *cli.Context) error {
+		port := c.String("port")
+		if os.Getenv("PORT") != "" {
+			port = os.Getenv("PORT")
+		}
 
-			dir := c.String("dir")
-			if os.Getenv("DIR") != "" {
-				dir = os.Getenv("DIR")
-			}
+		prefix := c.String("prefix")
+		if os.Getenv("PREFIX") != "" {
+			prefix = os.Getenv("PREFIX")
+		}
 
-			var cfg server.Config
-			px, _ := strconv.Atoi(port)
-			cfg.Port = int64(px)
-			cfg.Prefix = prefix
-			cfg.Dir = dir
+		dir := c.String("dir")
+		if os.Getenv("DIR") != "" {
+			dir = os.Getenv("DIR")
+		}
 
-			// // embed fs
-			// cfg.FSMode = "embed"
-			// cfg.Dir = "static/"
-			// cfg.EmbedFS = &static
+		var cfg server.Config
+		px, _ := strconv.Atoi(port)
+		cfg.Port = int64(px)
+		cfg.Prefix = prefix
+		cfg.Dir = dir
 
-			// // proxy
-			// cfg.Proxy.Rewrites = map[string]server.ProxyRewrite{
-			// 	"^/api/": {
-			// 		Target: "http://backend:8080",
-			// 		Rewrites: map[string]string{
-			// 			"^/api/(.*)": "/$1",
-			// 		},
-			// 	},
-			// 	"^/(.*)$": {
-			// 		Target: "http://frontend:8080",
-			// 	},
-			// }
+		// // embed fs
+		// cfg.FSMode = "embed"
+		// cfg.Dir = "static/"
+		// cfg.EmbedFS = &static
 
-			server.Serve(&cfg)
+		// // proxy
+		// cfg.Proxy.Rewrites = map[string]server.ProxyRewrite{
+		// 	"^/api/": {
+		// 		Target: "http://backend:8080",
+		// 		Rewrites: map[string]string{
+		// 			"^/api/(.*)": "/$1",
+		// 		},
+		// 	},
+		// 	"^/(.*)$": {
+		// 		Target: "http://frontend:8080",
+		// 	},
+		// }
 
-			return nil
-		},
-	}
+		server.Serve(&cfg)
 
-	if err := app.Run(os.Args); err != nil {
-		logger.Fatal("%s", err.Error())
-	}
+		return nil
+	})
+
+	app.Run()
 }

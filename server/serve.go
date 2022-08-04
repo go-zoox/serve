@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"path"
 
+	"github.com/go-zoox/debug"
 	"github.com/go-zoox/fs"
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/zoox"
@@ -50,8 +51,10 @@ type ProxyRewrite struct {
 
 // Serve starts the server.
 func Serve(cfg *Config) {
-	j, _ := json.MarshalIndent(cfg, "", "  ")
-	logger.Info(string(j))
+	if debug.IsDebugMode() {
+		j, _ := json.MarshalIndent(cfg, "", "  ")
+		logger.Info(string(j))
+	}
 
 	app := zd.Default()
 
@@ -74,7 +77,15 @@ func Serve(cfg *Config) {
 			panic("fs_mode is embed, but EmbedFS is nil")
 		}
 
-		subFS, _ := gofs.Sub(cfg.EmbedFS, "web")
+		if cfg.Dir == "" {
+			panic("dir is required, but empty")
+		}
+
+		if cfg.Dir[0] == '/' {
+			panic("dir must be relative path in embed mode")
+		}
+
+		subFS, _ := gofs.Sub(cfg.EmbedFS, cfg.Dir)
 
 		app.StaticFS(cfg.Prefix, http.FS(subFS))
 

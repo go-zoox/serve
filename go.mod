@@ -3,6 +3,7 @@ module github.com/go-zoox/serve
 go 1.18
 
 require (
+	github.com/go-zoox/debug v1.0.1
 	github.com/go-zoox/fs v1.2.5
 	github.com/go-zoox/logger v1.2.0
 	github.com/go-zoox/zoox v1.2.16
@@ -21,7 +22,6 @@ require (
 	github.com/go-zoox/core-utils v1.0.13 // indirect
 	github.com/go-zoox/crypto v1.0.3 // indirect
 	github.com/go-zoox/datetime v1.0.4 // indirect
-	github.com/go-zoox/debug v1.0.1 // indirect
 	github.com/go-zoox/encoding v1.0.7 // indirect
 	github.com/go-zoox/fetch v1.4.4 // indirect
 	github.com/go-zoox/jwt v1.0.0 // indirect

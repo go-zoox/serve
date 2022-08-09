@@ -3,9 +3,11 @@ package main
 import (
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/go-zoox/cli"
 	"github.com/go-zoox/fs"
+	"github.com/go-zoox/logger"
 
 	"github.com/go-zoox/serve/server"
 )
@@ -38,6 +40,10 @@ func main() {
 				Usage:   "The dir to listen on",
 				Aliases: []string{"d"},
 			},
+			&cli.StringFlag{
+				Name:  "basic-auth",
+				Usage: "Support basic auth, format: username:password,username2:password2",
+			},
 		},
 	})
 
@@ -57,11 +63,24 @@ func main() {
 			dir = os.Getenv("DIR")
 		}
 
+		basicAuth := c.String("basic-auth")
+
+		users := map[string]string{}
+		for _, u := range strings.Split(basicAuth, ",") {
+			user_pass := strings.Split(u, ":")
+			if len(user_pass) != 2 {
+				logger.Error("Invalid basic auth user: %s", u)
+				continue
+			}
+			users[user_pass[0]] = user_pass[1]
+		}
+
 		var cfg server.Config
 		px, _ := strconv.Atoi(port)
 		cfg.Port = int64(px)
 		cfg.Prefix = prefix
 		cfg.Dir = dir
+		cfg.BasicAuth = users
 
 		// // embed fs
 		// cfg.FSMode = "embed"

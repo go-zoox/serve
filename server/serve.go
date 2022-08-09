@@ -27,6 +27,8 @@ type Config struct {
 	EmbedFS *embed.FS
 	//
 	Proxy Proxy `yaml:"proxy"`
+	// Basic Auth Users Map
+	BasicAuth map[string]string `yaml:"basic_auth"`
 }
 
 // Proxy is the proxy configuration.
@@ -57,6 +59,10 @@ func Serve(cfg *Config) {
 	}
 
 	app := zd.Default()
+
+	if len(cfg.BasicAuth) > 0 {
+		app.Use(middleware.BasicAuth("go-zoox/serve", cfg.BasicAuth))
+	}
 
 	if cfg.Proxy.Rewrites != nil {
 		rewrites := make(map[string]middleware.ProxyRewrite)

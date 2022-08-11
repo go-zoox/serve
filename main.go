@@ -66,13 +66,15 @@ func main() {
 		basicAuth := c.String("basic-auth")
 
 		users := map[string]string{}
-		for _, u := range strings.Split(basicAuth, ",") {
-			user_pass := strings.Split(u, ":")
-			if len(user_pass) != 2 {
-				logger.Error("Invalid basic auth user: %s", u)
-				continue
+		if basicAuth != "" {
+			for _, u := range strings.Split(basicAuth, ",") {
+				user_pass := strings.Split(u, ":")
+				if len(user_pass) != 2 {
+					logger.Error("Invalid basic auth user: %s", u)
+					continue
+				}
+				users[user_pass[0]] = user_pass[1]
 			}
-			users[user_pass[0]] = user_pass[1]
 		}
 
 		var cfg server.Config

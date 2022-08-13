@@ -44,6 +44,10 @@ func main() {
 				Name:  "basic-auth",
 				Usage: "Support basic auth, format: username:password,username2:password2",
 			},
+			&cli.BoolFlag{
+				Name:  "enable-gzip",
+				Usage: "Enable gzip compression",
+			},
 		},
 	})
 
@@ -83,6 +87,7 @@ func main() {
 		cfg.Prefix = prefix
 		cfg.Dir = dir
 		cfg.BasicAuth = users
+		cfg.EnableGzip = c.Bool("enable-gzip")
 
 		// // embed fs
 		// cfg.FSMode = "embed"
@@ -102,9 +107,7 @@ func main() {
 		// 	},
 		// }
 
-		server.Serve(&cfg)
-
-		return nil
+		return server.Serve(&cfg)
 	})
 
 	app.Run()

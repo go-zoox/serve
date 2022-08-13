@@ -29,6 +29,8 @@ type Config struct {
 	Proxy Proxy `yaml:"proxy"`
 	// Basic Auth Users Map
 	BasicAuth map[string]string `yaml:"basic_auth"`
+	//
+	EnableGzip bool
 }
 
 // Proxy is the proxy configuration.
@@ -52,13 +54,17 @@ type ProxyRewrite struct {
 }
 
 // Serve starts the server.
-func Serve(cfg *Config) {
+func Serve(cfg *Config) error {
 	if debug.IsDebugMode() {
 		j, _ := json.MarshalIndent(cfg, "", "  ")
 		logger.Info(string(j))
 	}
 
 	app := zd.Default()
+
+	if cfg.EnableGzip {
+		app.Use(middleware.Gzip())
+	}
 
 	if len(cfg.BasicAuth) > 0 {
 		app.Use(middleware.BasicAuth("go-zoox/serve", cfg.BasicAuth))
@@ -113,5 +119,5 @@ func Serve(cfg *Config) {
 		}
 	}
 
-	app.Run(fmt.Sprintf(":%d", cfg.Port))
+	return app.Run(fmt.Sprintf(":%d", cfg.Port))
 }

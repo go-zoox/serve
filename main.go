@@ -72,12 +72,12 @@ func main() {
 		users := map[string]string{}
 		if basicAuth != "" {
 			for _, u := range strings.Split(basicAuth, ",") {
-				user_pass := strings.Split(u, ":")
-				if len(user_pass) != 2 {
+				userPass := strings.Split(u, ":")
+				if len(userPass) != 2 {
 					logger.Error("Invalid basic auth user: %s", u)
 					continue
 				}
-				users[user_pass[0]] = user_pass[1]
+				users[userPass[0]] = userPass[1]
 			}
 		}
 

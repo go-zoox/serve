@@ -17,11 +17,14 @@ func main() {
 		FSMode: "system",
 		//
 		Proxy: server.Proxy{
-			Rewrites: map[string]server.ProxyRewrite{
-				"^/api/": {
-					Target: "http://backend:8080",
-					Rewrites: map[string]string{
-						"^/api/(.*)$": "/$1",
+			Rewrites: server.ProxyGroupRewrites{
+				{
+					RegExp: "^/api/",
+					Rewrite: server.ProxyRewrite{
+						Target: "http://backend:8080",
+						Rewrites: server.ProxyRewriters{
+							{From: "^/api/(.*)$", To: "/$1"},
+						},
 					},
 				},
 			},

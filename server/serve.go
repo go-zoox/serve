@@ -12,6 +12,7 @@ import (
 	"github.com/go-zoox/debug"
 	"github.com/go-zoox/fs"
 	"github.com/go-zoox/logger"
+	"github.com/go-zoox/proxy/utils/rewriter"
 	"github.com/go-zoox/zoox"
 	zd "github.com/go-zoox/zoox/default"
 	"github.com/go-zoox/zoox/middleware"
@@ -36,22 +37,29 @@ type Config struct {
 // Proxy is the proxy configuration.
 type Proxy struct {
 	// Rewrites Example:
-	//	{
-	//		"^/api": {
-	//			target: "http://backend:8080",
-	//			rewrites: {
-	//				"^/api/(.*)$": "/$1",
+	//	[
+	//		{
+	//			regexp: "^/api",
+	//			rewrite: []{
+	//				target: "http://backend:8080",
+	//				rewrites: []{
+	//					from: "^/api/(.*)$",
+	//					to: "/$1",
+	//				}
 	//			},
 	//		},
-	//	}
-	Rewrites map[string]ProxyRewrite `yaml:"rewrites"`
+	//	]
+	Rewrites ProxyGroupRewrites `yaml:"rewrites"`
 }
 
-// ProxyRewrite is the proxy rewrite target configuration.
-type ProxyRewrite struct {
-	Target   string            `yaml:"target"`
-	Rewrites map[string]string `yaml:"rewrites"`
-}
+// ProxyGroupRewrites is the proxy group configuration.
+type ProxyGroupRewrites = middleware.ProxyGroupRewrites
+
+// ProxyRewrite is the proxy rewrite configuration.
+type ProxyRewrite = middleware.ProxyRewrite
+
+// ProxyRewriters is the proxy rewriters.
+type ProxyRewriters = rewriter.Rewriters
 
 // Serve starts the server.
 func Serve(cfg *Config) error {
@@ -71,16 +79,8 @@ func Serve(cfg *Config) error {
 	}
 
 	if cfg.Proxy.Rewrites != nil {
-		rewrites := make(map[string]middleware.ProxyRewrite)
-		for k, v := range cfg.Proxy.Rewrites {
-			rewrites[k] = middleware.ProxyRewrite{
-				Target:   v.Target,
-				Rewrites: v.Rewrites,
-			}
-		}
-
 		app.Use(middleware.Proxy(&middleware.ProxyConfig{
-			Rewrites: rewrites,
+			Rewrites: cfg.Proxy.Rewrites,
 		}))
 	}
 

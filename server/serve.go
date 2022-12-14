@@ -32,6 +32,8 @@ type Config struct {
 	BasicAuth map[string]string `yaml:"basic_auth"`
 	//
 	EnableGzip bool
+	//
+	Middlewares []zoox.Middleware
 }
 
 // Proxy is the proxy configuration.
@@ -76,6 +78,10 @@ func Serve(cfg *Config) error {
 
 	if len(cfg.BasicAuth) > 0 {
 		app.Use(middleware.BasicAuth("go-zoox/serve", cfg.BasicAuth))
+	}
+
+	if cfg.Middlewares != nil {
+		app.Use(cfg.Middlewares...)
 	}
 
 	if cfg.Proxy.Rewrites != nil {

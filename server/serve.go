@@ -14,7 +14,7 @@ import (
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/proxy/utils/rewriter"
 	"github.com/go-zoox/zoox"
-	zd "github.com/go-zoox/zoox/default"
+	defaults "github.com/go-zoox/zoox/defaults"
 	"github.com/go-zoox/zoox/middleware"
 )
 
@@ -68,7 +68,7 @@ func Serve(cfg *Config) error {
 		logger.Info(string(j))
 	}
 
-	app := zd.Default()
+	app := defaults.Default()
 
 	if cfg.EnableGzip {
 		app.Use(middleware.Gzip())

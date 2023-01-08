@@ -1,4 +1,4 @@
-name: Docker
+name: Release Docker Image
 
 on:
   push:
@@ -9,6 +9,7 @@ jobs:
   on-success:
     needs: publish
     runs-on: ubuntu-latest
+    container: whatwewant/zmicro:v1
     if: ${{ always() && needs.publish.result == 'success' }}
     steps:
       - name: Notification Feishu
@@ -20,11 +21,12 @@ jobs:
             分支: ${{ github.ref }}
             提交信息: ${{ github.event.head_commit.message }}
             提交人: ${{ github.actor }}
-            状态: 构建成功（https://github.com/${{ github.repository }}/actions/runs/${{ github.run.id }}）
-
+            状态: 构建成功（https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}）
+  
   on-failure:
     needs: publish
     runs-on: ubuntu-latest
+    container: whatwewant/zmicro:v1
     if: ${{ always() && needs.publish.result == 'failure' }}
     steps:
       - name: Notification Feishu
@@ -36,16 +38,13 @@ jobs:
             分支: ${{ github.ref }}
             提交信息: ${{ github.event.head_commit.message }}
             提交人: ${{ github.actor }}
-            状态: 构建失败（https://github.com/${{ github.repository }}/actions/runs/${{ github.run.id }}）
+            状态: 构建失败（https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}）
 
   publish:
     runs-on: ubuntu-latest
     container: whatwewant/zmicro:v1
 
     steps:
-      - name: Update zmicro to latest
-        run: zmicro update
-
       - name: Get Current Date
         id: date
         run: echo "::set-output name=date::$(date +'%Y-%m-%d')"
@@ -72,9 +71,6 @@ jobs:
         run: |
           echo "Docker Tags: ${{ steps.meta.outputs.tags }}"
 
-      - name: Fix QEMU depends on Docker CLI
-        run: zmicro package install docker
-
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
 
@@ -93,8 +89,6 @@ jobs:
         with:
           build-args: |
             VERSION=${{ steps.meta.outputs.version }}
-            BUILD_TIME=${{ steps.meta.outputs.build_time }}
-            COMMIT_HASH=${{ steps.meta.outputs.commit_hash }}
           context: .
           push: ${{ github.event_name != 'pull_request' }}
           cache-from: type=registry,ref=${{ steps.meta.outputs.name }}:buildcache
@@ -102,3 +96,4 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           platforms: linux/amd64
+

@@ -8,10 +8,12 @@ import (
 	gofs "io/fs"
 	"net/http"
 	"path"
+	"regexp"
 
 	"github.com/go-zoox/debug"
 	"github.com/go-zoox/fs"
 	"github.com/go-zoox/logger"
+	"github.com/go-zoox/proxy"
 	"github.com/go-zoox/proxy/utils/rewriter"
 	"github.com/go-zoox/zoox"
 	defaults "github.com/go-zoox/zoox/defaults"
@@ -32,6 +34,8 @@ type Config struct {
 	BasicAuth map[string]string `yaml:"basic_auth"`
 	//
 	EnableGzip bool
+	//
+	Middlewares []zoox.Middleware
 }
 
 // Proxy is the proxy configuration.
@@ -50,6 +54,9 @@ type Proxy struct {
 	//		},
 	//	]
 	Rewrites ProxyGroupRewrites `yaml:"rewrites"`
+
+	// Dynamic Example:
+	Dynamic func(ctx *zoox.Context) ProxyGroupRewrites
 }
 
 // ProxyGroupRewrites is the proxy group configuration.
@@ -76,6 +83,31 @@ func Serve(cfg *Config) error {
 
 	if len(cfg.BasicAuth) > 0 {
 		app.Use(middleware.BasicAuth("go-zoox/serve", cfg.BasicAuth))
+	}
+
+	if cfg.Middlewares != nil {
+		app.Use(cfg.Middlewares...)
+	}
+
+	if cfg.Proxy.Dynamic != nil {
+		app.Use(func(ctx *zoox.Context) {
+			rewrites := cfg.Proxy.Dynamic(ctx)
+
+			for _, group := range rewrites {
+				if matched, err := regexp.MatchString(group.RegExp, ctx.Path); err == nil && matched {
+					// @BUG: this is not working
+					p := proxy.NewSingleTarget(group.Rewrite.Target, &proxy.SingleTargetConfig{
+						Rewrites: group.Rewrite.Rewrites,
+						// ChangeOrigin: true,
+					})
+
+					p.ServeHTTP(ctx.Writer, ctx.Request)
+					return
+				}
+			}
+
+			ctx.Next()
+		})
 	}
 
 	if cfg.Proxy.Rewrites != nil {

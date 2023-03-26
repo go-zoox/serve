@@ -48,6 +48,20 @@ func main() {
 				Name:  "enable-gzip",
 				Usage: "Enable gzip compression",
 			},
+			&cli.StringFlag{
+				Name:  "api",
+				Usage: "backend api url, such http://api.example.com",
+			},
+			&cli.StringFlag{
+				Name:  "api-path",
+				Usage: "The api path",
+				Value: "/api",
+			},
+			&cli.BoolFlag{
+				Name:  "rewrite-api-path",
+				Usage: "Rewrite the api path, example: /api/v1/users -> /v1/users",
+				Value: false,
+			},
 		},
 	})
 
@@ -88,6 +102,9 @@ func main() {
 		cfg.Dir = dir
 		cfg.BasicAuth = users
 		cfg.EnableGzip = c.Bool("enable-gzip")
+		cfg.Api = c.String("api")
+		cfg.ApiPath = c.String("api-path")
+		cfg.IsApiPathRewrite = c.Bool("rewrite-api-path")
 
 		// // embed fs
 		// cfg.FSMode = "embed"

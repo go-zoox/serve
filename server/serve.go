@@ -36,6 +36,10 @@ type Config struct {
 	EnableGzip bool
 	//
 	Middlewares []zoox.Middleware
+	//
+	Api              string
+	ApiPath          string
+	IsApiPathRewrite bool
 }
 
 // Proxy is the proxy configuration.
@@ -114,6 +118,22 @@ func Serve(cfg *Config) error {
 		app.Use(middleware.Proxy(&middleware.ProxyConfig{
 			Rewrites: cfg.Proxy.Rewrites,
 		}))
+	}
+
+	if cfg.Api != "" {
+		to := fmt.Sprintf("%s/$1", cfg.ApiPath)
+		if cfg.IsApiPathRewrite {
+			to = "/$1"
+		}
+
+		app.Proxy(cfg.ApiPath, cfg.Api, &proxy.SingleTargetConfig{
+			Rewrites: ProxyRewriters{
+				{
+					From: fmt.Sprintf("%s/(.*)", cfg.ApiPath),
+					To:   to,
+				},
+			},
+		})
 	}
 
 	if cfg.FSMode == "embed" {

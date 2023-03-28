@@ -36,3 +36,5 @@ data/
 bin/
 
 static/
+
+tmp/

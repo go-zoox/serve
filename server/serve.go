@@ -126,13 +126,13 @@ func Serve(cfg *Config) error {
 			to = "/$1"
 		}
 
-		app.Proxy(cfg.ApiPath, cfg.Api, &proxy.SingleTargetConfig{
-			Rewrites: ProxyRewriters{
+		app.Proxy(cfg.ApiPath, cfg.Api, func(cfgX *proxy.SingleTargetConfig) {
+			cfgX.Rewrites = ProxyRewriters{
 				{
 					From: fmt.Sprintf("%s/(.*)", cfg.ApiPath),
 					To:   to,
 				},
-			},
+			}
 		})
 	}
 

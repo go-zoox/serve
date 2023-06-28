@@ -115,7 +115,7 @@ func Serve(cfg *Config) error {
 	}
 
 	if cfg.Proxy.Rewrites != nil {
-		app.Use(middleware.Proxy(&middleware.ProxyConfig{
+		app.Use(middleware.ProxyGroups(&middleware.ProxyGroupsConfig{
 			Rewrites: cfg.Proxy.Rewrites,
 		}))
 	}
@@ -126,12 +126,17 @@ func Serve(cfg *Config) error {
 			to = "/$1"
 		}
 
-		app.Proxy(cfg.ApiPath, cfg.Api, func(cfgX *proxy.SingleTargetConfig) {
+		app.Proxy(cfg.ApiPath, cfg.Api, func(cfgX *zoox.ProxyConfig) {
 			cfgX.Rewrites = ProxyRewriters{
 				{
 					From: fmt.Sprintf("%s/(.*)", cfg.ApiPath),
 					To:   to,
 				},
+			}
+
+			cfgX.OnRequest = func(req *http.Request) error {
+				fmt.Println("cfg.ApiPath", cfg.ApiPath, req.URL.Path)
+				return nil
 			}
 		})
 	}

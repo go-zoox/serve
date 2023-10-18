@@ -100,7 +100,7 @@ func Serve(cfg *Config) error {
 			for _, group := range rewrites {
 				if matched, err := regexp.MatchString(group.RegExp, ctx.Path); err == nil && matched {
 					// @BUG: this is not working
-					p := proxy.NewSingleTarget(group.Rewrite.Target, &proxy.SingleTargetConfig{
+					p := proxy.NewSingleHost(group.Rewrite.Target, &proxy.SingleHostConfig{
 						Rewrites: group.Rewrite.Rewrites,
 						// ChangeOrigin: true,
 					})

@@ -1,4 +1,4 @@
-package main
+package serve
 
 // Version is the version of the application.
 var Version = "1.5.9"

@@ -32,7 +32,7 @@ RUN CGO_ENABLED=0 \
       -X "github.com/go-zoox/serve/constants.CommitHash=${COMMIT_HASH}" \
       -w -s -buildid= \
     ' \
-  -v -o serve
+  -v -o serve ./cmd/serve
 
 # Product
 FROM whatwewant/alpine:v3.17-1

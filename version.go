@@ -1,4 +1,4 @@
 package serve
 
 // Version is the version of the application.
-var Version = "1.5.9"
+var Version = "1.6.0"

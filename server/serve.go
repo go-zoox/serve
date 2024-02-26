@@ -81,6 +81,10 @@ func Serve(cfg *Config) error {
 
 	app := defaults.Default()
 
+	// app.Config.HTTPSPort = 8443
+	// app.Config.TLSCertFile = "/opt/data/plugins/local-https/domain/localhost/server.crt"
+	// app.Config.TLSKeyFile = "/opt/data/plugins/local-https/domain/localhost/server.key"
+
 	if cfg.EnableGzip {
 		app.Use(middleware.Gzip())
 	}

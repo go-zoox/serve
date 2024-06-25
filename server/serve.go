@@ -139,7 +139,6 @@ func Serve(cfg *Config) error {
 			}
 
 			cfgX.OnRequest = func(req *http.Request) error {
-				fmt.Println("cfg.ApiPath", cfg.ApiPath, req.URL.Path)
 				return nil
 			}
 		})

@@ -15,6 +15,7 @@ import (
 	"github.com/go-zoox/logger"
 	"github.com/go-zoox/proxy"
 	"github.com/go-zoox/proxy/utils/rewriter"
+	"github.com/go-zoox/serve"
 	"github.com/go-zoox/zoox"
 	defaults "github.com/go-zoox/zoox/defaults"
 	"github.com/go-zoox/zoox/middleware"
@@ -81,9 +82,23 @@ func Serve(cfg *Config) error {
 
 	app := defaults.Default()
 
+	app.SetBanner(fmt.Sprintf(`
+  _____       _______  ___    ____                
+ / ___/__    /  _/ _ \/ _ \  / __/__ _____  _____ 
+/ (_ / _ \  _/ // // / ___/ _\ \/ -_) __/ |/ / -_)
+\___/\___/ /___/____/_/    /___/\__/_/  |___/\__/  v%s
+
+Lightweight, high performance HTTP Server for Frontend
+	also support proxy and static file server.
+____________________________________O/_______
+                                    O\
+`, serve.Version))
+
 	// app.Config.HTTPSPort = 8443
 	// app.Config.TLSCertFile = "/opt/data/plugins/local-https/domain/localhost/server.crt"
 	// app.Config.TLSKeyFile = "/opt/data/plugins/local-https/domain/localhost/server.key"
+
+	// app.Config.LogLevel = "info"
 
 	if cfg.EnableGzip {
 		app.Use(middleware.Gzip())
@@ -178,6 +193,11 @@ func Serve(cfg *Config) error {
 			})
 		}
 	}
+
+	fmt.Println("register: /abc/*filepath")
+	app.Get("/abc/*filepath", func(ctx *zoox.Context) {
+		ctx.String(200, "hello")
+	})
 
 	return app.Run(fmt.Sprintf(":%d", cfg.Port))
 }

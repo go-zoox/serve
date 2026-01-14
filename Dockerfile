@@ -51,4 +51,4 @@ ENV VERSION=${VERSION}
 
 COPY entrypoint.sh /entrypoint.sh
 
-CMD /entrypoint.sh
+CMD serve

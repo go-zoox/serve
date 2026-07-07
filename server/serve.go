@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"io"
 	gofs "io/fs"
+	"net"
 	"net/http"
 	"path"
 	"regexp"
+	"strings"
+	"time"
 
 	"github.com/go-zoox/debug"
 	"github.com/go-zoox/fs"
@@ -20,6 +23,57 @@ import (
 	defaults "github.com/go-zoox/zoox/defaults"
 	"github.com/go-zoox/zoox/middleware"
 )
+
+func getInternalIPs() []string {
+	var ips []string
+	addrs, err := net.InterfaceAddrs()
+	if err != nil {
+		return ips
+	}
+	for _, addr := range addrs {
+		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() && ipnet.IP.To4() != nil {
+			ips = append(ips, ipnet.IP.String())
+		}
+	}
+	return ips
+}
+
+func printServerInfo(port int64, ips []string) {
+	localURL := fmt.Sprintf("http://127.0.0.1:%d", port)
+	lines := []string{
+		"  Serving!",
+		fmt.Sprintf("  Local:    %s", localURL),
+	}
+	for _, ip := range ips {
+		lines = append(lines, fmt.Sprintf("  Network:  http://%s:%d", ip, port))
+	}
+
+	maxLen := 0
+	for _, line := range lines {
+		if len(line) > maxLen {
+			maxLen = len(line)
+		}
+	}
+
+	pad := func(s string) string {
+		return s + strings.Repeat(" ", maxLen-len(s))
+	}
+
+	boxWidth := maxLen + 2
+	border := strings.Repeat("─", boxWidth)
+
+	fmt.Println()
+	fmt.Printf("  ┌%s┐\n", border)
+	fmt.Printf("  │ %s │\n", pad(""))
+	fmt.Printf("  │ %s │\n", pad(lines[0]))
+	fmt.Printf("  │ %s │\n", pad(""))
+	for _, line := range lines[1:] {
+		fmt.Printf("  │ %s │\n", pad(line))
+	}
+	fmt.Printf("  │ %s │\n", pad(""))
+	fmt.Printf("  └%s┘\n", border)
+	fmt.Println()
+}
 
 // Config is the configuration of the server.
 type Config struct {
@@ -199,5 +253,23 @@ ____________________________________O/_______
 		ctx.String(200, "hello")
 	})
 
-	return app.Run(fmt.Sprintf(":%d", cfg.Port))
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- app.Run(fmt.Sprintf(":%d", cfg.Port))
+	}()
+
+	addr := fmt.Sprintf(":%d", cfg.Port)
+	for i := 0; i < 100; i++ {
+		conn, err := net.DialTimeout("tcp", addr, 100*time.Millisecond)
+		if err == nil {
+			conn.Close()
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+
+	ips := getInternalIPs()
+	printServerInfo(cfg.Port, ips)
+
+	return <-errCh
 }
